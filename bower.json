@@ -1,5 +1,6 @@
 {
-  "name": "wpMenuEditor",
+  "name": "jquery.wpmenuEditor",
+  "version": "0.1",
   "homepage": "https://idoenk.github.io/wpm",
   "authors": [
     "Idoenk <1d03nk@gmail.com>"
@@ -22,7 +23,7 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "1.10",
+    "jquery": ">= 1.10",
     "Sortable": "sortablejs#^1.13.0"
   }
 }
