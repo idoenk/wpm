@@ -1,0 +1,146 @@
+<html>
+  <head>
+    <title>Wordpress Menu Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../src/style.css" />
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.13.0/Sortable.min.js"></script>
+
+    <script src="../src/jquery.wpmenu-editor.js"></script>
+  </head>
+  <body>
+    <h1 class="text-center m-4">Wordpress Menu Editor</h1>
+
+    <div class=container>
+        <div class=row>
+            <div class=col-4>
+                <div class=p-3>
+                    <div class="wpmenu-accordion" data-target=".wpmenu-editor">
+                        <div class="wpmenu-accordion-item" data-type="link">
+                            <div class="wpmenu-accordion-header">
+                                <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#custom-link" aria-expanded="false" aria-controls="custom-link">
+                                    Link
+                                    <i class="icon icon-down"></i>
+                                </button>
+                            </div>
+                            <div class="wpmenu-accordion-body" id="custom-link">
+                                <div class="wpmenu-input">
+                                    <div class="mb-2">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <label for="inputLabel" class="input-group-text">Text</label>
+                                            </div>
+                                            <input id="inputLabel" data-field="text" type="text" class="form-control" placeholder="Enter text url here" autocomplete="off"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <label for="inputURL" class="input-group-text">URL</label>
+                                            </div>
+                                            <input id="inputURL" data-field="url" type="text" class="form-control" placeholder="http://" autocomplete="off"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="wpmenu-action mt-3 mb-1">
+                                    <button class="btn btn-sm btn-outline-secondary float-right btn-addmenu" type="button">Add to Menu</button>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="wpmenu-accordion-item" data-type="category">
+                            <div class="wpmenu-accordion-header">
+                                <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#category-list" aria-expanded="false" aria-controls="category-list">
+                                    Categories
+                                    <i class="icon icon-down"></i>
+                                </button>
+                            </div>
+                            <div class="wpmenu-accordion-body" id="category-list">
+                                <div class="wpmenu-input">
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="check-article" data-url="/articles" data-text="Articles">
+                                                <label class="custom-control-label" for="check-article">Article</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="check-berita" data-url="/berita" data-text="Berita">
+                                                <label class="custom-control-label" for="check-berita">Berita</label>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="check-news" data-url="/news" data-text="News">
+                                                <label class="custom-control-label" for="check-news">News</label>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="wpmenu-action mt-3 mb-1">
+                                    <button class="btn btn-sm btn-outline-secondary float-right btn-addmenu" type="button">Add to Menu</button>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class=col-8>
+                <div class="p-3 wrap-wpmenu-list">
+                    <ul class="wpmenu-editor" data-menus='[{"url":"/", "text":"Home", "type":"link"}]'></ul>
+                </div>
+
+                <div class=p-3>
+                    <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Get data</button>
+                </div>
+                <div class="p-3 mb-3">
+                    <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:100px;"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+      (function($){
+        function clog(x){console.warn(x)}
+
+        $(function(){
+            var wpmenu_options = {
+                max_depth: 2,
+                inline_addmenu: true,
+                btn_addmenu_selector: '.wpmenu-accordion .btn-addmenu',
+                btn_getdata: '.btn-getdata-wpmenu',
+
+                // Force inserted text to be ucwords formated
+                addMenuDataCollector: function(data) {
+                    var item_data = data[0];
+                    item_data.text = item_data.text.toLowerCase()
+                        .replace(/(?<= )[^\s]|^./g, a => a.toUpperCase());
+
+                    data[0] = item_data;
+
+                    return data;
+                },
+            };
+            var $wpmenu = $('.wpmenu-editor').wpMenuEditor(wpmenu_options);
+
+            // get output
+            $('.btn-getdata-wpmenu').on('click', function(){
+                $('.output-result').val($wpmenu.wpMenuEditor('data'));
+            });
+        });
+      })(window.$||window.jQuery||jQuery);
+    </script>
+  </body>
+</html>

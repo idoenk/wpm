@@ -1,0 +1,12 @@
+{
+    "name": "wpMenuEditor",
+    "description": "wpMenuEditor is jQuery based plugin to edit menus like in Wordpress.",
+    "main": [
+        "dist/js/jquery.wpmenu-editor.js",
+    ],
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:idx/wpmenueditor.git"
+    }
+}
