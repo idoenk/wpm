@@ -38,7 +38,7 @@
             always_show_url: false,
             inline_addmenu: true,
             max_depth: 2,
-            btn_addmenu_selector: '.wpmenu-accordion .btn-addmenu',
+            btn_addmenu_selector: '[data-wpmenu-type] .btn-addmenu',
 
             /**
              * Custom data collector before add menu
@@ -890,15 +890,15 @@
 
             $(this.options.btn_addmenu_selector).each(function(){
                 var $btn_addmenu = $(this),
-                    $wrap = $btn_addmenu.closest('.wpmenu-accordion-item'),
+                    $wrap = $btn_addmenu.closest('[data-wpmenu-type]'),
                     menu_type = $wrap.data('type') || 'link',
-                    $parent = $wrap.closest('.wpmenu-accordion');
+                    $parent = $wrap.closest('[data-wpmenu-target]');
                     $btn_toggler = $wrap.find('[data-toggle]'),
 
                 // on click: btn_addmenu_selector
                 $btn_addmenu.on('click', function(e){
                     var $me = $(this),
-                        $wrap = $me.closest('.wpmenu-accordion-body'),
+                        $wrap = $me.closest('[data-wpmenu-type]'),
                         item_data = {type: menu_type},
                         data = []
                     ;
@@ -947,14 +947,14 @@
                     if (!$target.length)
                         return !0;
 
-                    $item = $me.closest('.wpmenu-accordion-item');
-                    $parent = $item.closest('.wpmenu-accordion');
+                    $item = $me.closest('[data-wpmenu-type]');
+                    $parent = $item.closest('[data-wpmenu-target]');
 
                     $item.addClass('going-to');
-                    $parent.find('.wpmenu-accordion-item.show:not(.going-to)')
+                    $parent.find('[data-wpmenu-type].show:not(.going-to)')
                         .each(function(){
                             var $me = $(this);
-                            var $body = $me.find('.wpmenu-accordion-body');
+                            var $body = $me.find('[data-wpmenu-body]');
                             $me.removeClass('show');
 
                             if (!$body.is($target)){
@@ -969,7 +969,7 @@
 
                         $me.toggleClass('show', isVisible);
 
-                        $me.closest('.wpmenu-accordion-item')
+                        $me.closest('[data-wpmenu-type]')
                             .toggleClass('show', isVisible);
                     });
 
