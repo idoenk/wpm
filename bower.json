@@ -1,12 +1,28 @@
 {
-    "name": "wpMenuEditor",
-    "description": "wpMenuEditor is jQuery based plugin to edit menus like in Wordpress.",
-    "main": [
-        "dist/js/jquery.wpmenu-editor.js",
-    ],
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:idx/wpmenueditor.git"
-    }
+  "name": "wpMenuEditor",
+  "homepage": "https://idoenk.github.io/wpm",
+  "authors": [
+    "Idoenk <1d03nk@gmail.com>"
+  ],
+  "description": "wpMenuEditor is jQuery based plugin to edit menus like in Wordpress.",
+  "main": "src/jquery.wpmenu-editor.js",
+  "keywords": [
+    "wordpress",
+    "menu",
+    "editor",
+    "jquery",
+    "plugin"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "1.10",
+    "Sortable": "sortablejs#^1.13.0"
+  }
 }
