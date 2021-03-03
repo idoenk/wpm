@@ -23,7 +23,7 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": ">= 1.10",
+    "jquery": ">= 3.4.0",
     "Sortable": "sortablejs#^1.13.0"
   }
 }
