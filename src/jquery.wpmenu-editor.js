@@ -285,14 +285,10 @@
          */
         _templateMenu: function(data, menu_depth){
             var $item = null,
-                random_id = null,
+                random_id = Utils.getRandomInt(111, 99999),
                 html_inner_menu = '';
 
-            data = data || {};
-
-            // if (!data.id)
-            //     data.id = Utils.getRandomInt(1, 99999);
-            random_id = Utils.getRandomInt(1, 99999);
+            data = data||{};
 
             if (!data.type)
                 data.type = 'link';
@@ -300,9 +296,11 @@
             if (!menu_depth)
                 menu_depth = 0;
 
+            menu_depth = parseInt(menu_depth);
+
             // Menu base-template
             $item = $(''
-                +'<li class="menu-item"'+(menu_depth ? ' data-wpmenu_depth style="--wpmenu_depth:'+parseInt(menu_depth)+'"':'')+'>'
+                +'<li class="menu-item"'+(menu_depth ? ' data-wpmenu-depth="'+menu_depth+'" style="--wpmenu-depth:'+menu_depth+'"':'')+'>'
                 +   '<div class="menu-item-bar">'
                 +       '<div class="menu-item-handle sortable-handle-bar">'
                 +           '<div class="item-title"></div>'
@@ -501,7 +499,7 @@
         _moveMenu: function($menu_item, action) {
             var menu_index = $menu_item.index();
             var menu_count = $menu_item.parent().find('.menu-item').length;
-            var menu_depth = parseInt($menu_item.css('--wpmenu_depth'));
+            var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
 
             var $menu_target = null;
             var menu_target_index = null;
@@ -529,26 +527,26 @@
 
             switch (action) {
                 case "child-in":
-                    menu_depth = (menu_depth + 1);
+                    menu_depth = parseInt(menu_depth + 1);
 
                     $menu_item
-                        .attr('data-wpmenu_depth', menu_depth)
-                        .css('--wpmenu_depth', menu_depth);
+                        .css('--wpmenu-depth', menu_depth)
+                        .attr('data-wpmenu-depth', menu_depth)
                 break;
 
                 case "child-out":
-                    menu_depth = (menu_depth - 1);
+                    menu_depth = parseInt(menu_depth - 1);
 
                     if (!menu_depth){
                         $menu_item
-                            .removeAttr('data-wpmenu_depth')
-                            .css('--wpmenu_depth', '');
+                            .css('--wpmenu-depth', '')
+                            .removeAttr('data-wpmenu-depth')
 
                     }
                     else{
                         $menu_item
-                            .attr('data-wpmenu_depth', menu_depth)
-                            .css('--wpmenu_depth', menu_depth);
+                            .css('--wpmenu-depth', menu_depth)
+                            .attr('data-wpmenu-depth', menu_depth)
                     }
                 break;
 
@@ -611,7 +609,7 @@
             $menu_item.find('.action-child, .action-child [data-act]')
                 .addClass('d-none');
 
-            var menu_depth = $menu_item.css('--wpmenu_depth');
+            var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
 
             if (index == 0){
                 $menu_item.find('[data-act="up"]')
@@ -620,8 +618,8 @@
 
                 // As first index menu must have zero depth
                 if (menu_depth) {
-                    $menu_item.removeAttr('data-wpmenu_depth')
-                        .css('--wpmenu_depth', '');
+                    $menu_item.removeAttr('data-wpmenu-depth')
+                        .css('--wpmenu-depth', '');
                 }
             }
             else {
@@ -643,7 +641,7 @@
 
                 // Check control visibility of menu item based on its depth
                 var $prev_menu = $menu_item.prev(),
-                    prev_menu_depth = $prev_menu.css('--wpmenu_depth'),
+                    prev_menu_depth = parseInt($prev_menu.attr('data-wpmenu-depth'))||0,
                     $under_element = null,
                     $parent = null;
 
@@ -718,12 +716,22 @@
             var instance = this;
             var data = [];
             var _data = [];
-            var field_index = '__wpmenu_index_'+Utils.getRandomInt(1111, 99999999);
-            var field_parent_index = '__wpmenu_parent_index_'+Utils.getRandomInt(1111, 99999999);
+            var field_index = '__wpmenu_idx_'+Utils.getRandomInt(111, 999999);
+            var field_parent_index = '__wpmenu_parent_idx_'+Utils.getRandomInt(111, 999999);
 
             // associate data to its index
             var data_indexed = {};
 
+            // Sort data menu by index desc
+            const sorter_desc = function(a, b){
+                return b[field_index] - a[field_index];
+            };
+            // Sort data menu by index asc
+            const sorter_asc = function(a, b){
+                return a[field_index] - b[field_index];
+            };
+
+            // Final act cleanup menus from helper keys
             var cleanupMenu = function(menus){
                 var newdata = [];
                 for(var i=0, iL=menus.length; i<iL; i++){
@@ -745,11 +753,11 @@
                 return newdata;
             };
 
+            // collect raw to _data
             this.$el.find('.menu-item').each(function(index, item){
-
                 var $menu_item = $(this);
                 var $menu_prev = $menu_item.prev();
-                var menu_depth = parseInt($menu_item.css('--wpmenu_depth'));
+                var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
 
                 var item_data = $menu_item.data('menu') || {};
                 var live_data = {};
@@ -785,21 +793,13 @@
                 _data.push(item_data);
             });
 
-            // Sort data menu by index desc
-            const sorter_desc = function(a, b){
-                return b.index - a.index;
-            };
-            // Sort data menu by index asc
-            const sorter_asc = function(a, b){
-                return a.index - b.index;
-            };
-
 
             for(var i=0, iL=_data.length; i<iL; i++){
                 var item = JSON.parse(JSON.stringify(_data[i]));
                 var index = _data[i][field_index];
                 data_indexed[""+index] = item;
             }
+
 
             for(var i=_data.length-1, iL=0; i>=iL; i--){
                 var item = JSON.parse(JSON.stringify(data_indexed[""+i]));
@@ -838,15 +838,15 @@
          * return Object|null
          */
         _findParentMenuOf: function($menu_item) {
-            var depth = $menu_item.css('--wpmenu_depth');
+            var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
             var $menu_prev = $menu_item.prev();
-            var prev_depth = $menu_prev.css('--wpmenu_depth');
+            var prev_depth = null;
             var found_it = false;
             var lost_it = false;
             var max_step = 100;
             var step = 1;
 
-            if (!depth)
+            if (!menu_depth)
                 return null;
 
             while(!found_it && !lost_it){
@@ -854,8 +854,8 @@
                 lost_it = !$menu_prev.hasClass('menu-item');
 
                 if (!lost_it){
-                    prev_depth = $menu_prev.css('--wpmenu_depth');
-                    if (prev_depth != depth)
+                    prev_depth = parseInt($menu_prev.attr('data-wpmenu-depth'))||0;
+                    if (prev_depth < menu_depth)
                         found_it = true;
                 }
                 step++;

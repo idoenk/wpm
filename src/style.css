@@ -32,11 +32,11 @@
     width: 382px;
     margin-bottom: 4px;
 }
-.wpmenu-editor .menu-item[data-wpmenu_depth] {
+.wpmenu-editor .menu-item[data-wpmenu-depth] {
     
-    margin-left: calc(var(--wpmenu_depth) * 20px);
+    margin-left: calc(var(--wpmenu-depth) * 20px);
 }
-.wpmenu-editor .menu-item[data-wpmenu_depth] + .menu-item:not([data-wpmenu_depth]) {
+.wpmenu-editor .menu-item[data-wpmenu-depth] + .menu-item:not([data-wpmenu-depth]) {
     margin-top: 8px;
 }
 
