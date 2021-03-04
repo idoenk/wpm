@@ -98,7 +98,7 @@
 
             <div class="col">
                 <div class="wrap-wpmenu-list mb-3">
-                    <ul class="wpmenu-editor" data-menus='[{"url":"/", "text":"Home", "type":"link"}]'></ul>
+                    <ul class="wpmenu-editor" data-menus='[{"url":"/", "text":"Home", "type":"link"}, {"url":"/profile", "text":"Profile", "type":"link"}]'></ul>
                 </div>
 
                 <div class="wrap-action mb-3">
@@ -125,16 +125,18 @@
                 inline_addmenu: true,
                 btn_addmenu_selector: '.btn-addmenu',
 
-                // Force inserted text to be ucwords formated
-                addMenuDataCollector: function(data) {
-                    var item_data = data[0];
-                    item_data.text = item_data.text.toLowerCase()
-                        .replace(/(?<= )[^\s]|^./g, a => a.toUpperCase());
+                confirm_remove_menu: true,
 
-                    data[0] = item_data;
+                onMenuConfirmRemove: function(e, $item){
+                    var menu_name = $item.find('.item-title').text();
 
-                    return data;
+                    return confirm('You are about to remove menu: '+menu_name+"\nContinue?");
                 },
+
+                // Assign event on menu removed
+                onMenuRemoved: function(e){
+                    clog('Menu has been removed');
+                }
             };
 
             var $wpmenu = $('.wpmenu-editor').wpMenuEditor(wpmenu_options);

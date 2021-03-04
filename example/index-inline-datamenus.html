@@ -102,12 +102,13 @@
                 </div>
 
                 <div class="wrap-action mb-3">
-                    <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Get data</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Output JSON</button>
                 </div>
 
-                <div class="mb-3">
-                    <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:100px; width: 100%;"></textarea>
+                <div class="mb-5">
+                    <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:150px; width: 100%;"></textarea>
                 </div>
+                <div class="mb-5">&nbsp;</div>
             </div>
         </div>
     </div>
@@ -122,9 +123,9 @@
             var wpmenu_options = {
                 max_depth: 2,
                 inline_addmenu: true,
-                btn_addmenu_selector: '.wpmenu-accordion .btn-addmenu',
-                btn_getdata: '.btn-getdata-wpmenu',
+                btn_addmenu_selector: '.btn-addmenu',
             };
+
             var $wpmenu = $('.wpmenu-editor').wpMenuEditor(wpmenu_options);
 
             // get output

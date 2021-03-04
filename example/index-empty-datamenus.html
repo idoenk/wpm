@@ -102,11 +102,12 @@
                 </div>
 
                 <div class="wrap-action mb-3">
-                    <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Get data</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Output JSON</button>
                 </div>
-                <div class="mb-3">
-                    <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:100px; width: 100%;"></textarea>
+                <div class="mb-5">
+                    <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:150px; width: 100%;"></textarea>
                 </div>
+                <div class="mb-5">&nbsp;</div>
             </div>
         </div>
     </div>
@@ -117,15 +118,13 @@
       (function($){
         function clog(x){console.warn(x)}
 
-        // var data_menus = [{"id":12, "url":"/", "text":"Home", "type":"link"}, {"id":73, "url":"/profile", "text":"Profile", "type":"link", "submenu": [{"id":32, "url":"/profile/about-us", "text":"About Us", "type":"link"}]}, {"id":52, "url":"/blog", "text":"Blog", "type":"link", "submenu": [{"id":521, "url":"/sports", "text":"Sports", "type":"category"}, {"id":523, "url":"/news", "text":"News", "type":"category"}]}, {"id":23, "url":"/contact", "text":"Contact", "type":"page", "new_tab":true}];
-
         $(function(){
             var wpmenu_options = {
                 max_depth: 2,
                 inline_addmenu: true,
-                btn_addmenu_selector: '.wpmenu-accordion .btn-addmenu',
-                btn_getdata: '.btn-getdata-wpmenu',
+                btn_addmenu_selector: '.btn-addmenu',
             };
+
             var $wpmenu = $('.wpmenu-editor').wpMenuEditor(wpmenu_options);
 
             // get output
