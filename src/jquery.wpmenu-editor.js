@@ -758,12 +758,13 @@
 
                 // menu item is a submenu of other
                 if (menu_depth){
+                    clog('in here: name: '+$menu_item.find('.item-title').text()+', menu_depth='+menu_depth);
                     $parent = this._findParentMenuOf.call(this, $menu_item);
 
                     if ($parent && $parent.length){
                         parent_menu_depth = parseInt($parent.attr('data-wpmenu-depth'))||0;
 
-                        // Corrent depth menu item
+                        // Correct depth menu item
                         if (Math.abs(menu_depth - parent_menu_depth) > 1){
                             $menu_item.attr('data-wpmenu-depth', (parent_menu_depth+1))
                                 .css('--wpmenu-depth', (parent_menu_depth+1))
@@ -780,6 +781,13 @@
                                 .text('Under '+$prev_menu.find('.item-title').text())
                                 .removeClass('d-none');
                         }
+                    }
+                    else if (prev_menu_depth > menu_depth){
+                        $parent = this._findParentMenuOf.call(this, $prev_menu);
+
+                        $menu_item.find('[data-act="child-in"]')
+                            .text('Under '+$parent.find('.item-title').text())
+                            .removeClass('d-none');
                     }
                     else{
                         $menu_item.find('[data-act="child-in"]')
