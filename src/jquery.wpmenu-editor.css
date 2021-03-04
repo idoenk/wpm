@@ -1,5 +1,5 @@
 
-.wrap-wpmenu-list {
+.wpmenu-editor-container {
     position: relative;
     padding-bottom: 20px;
 }
@@ -17,6 +17,18 @@
     text-align: center;
     display: none;
 }
+.wpmenu-editor.empty-menu + .wrap-inline-action {
+    position: static;
+    display: block;
+    padding: 10px;
+    border: 1px dotted #eee;
+}
+.wpmenu-editor.empty-menu + .wrap-inline-action:after {
+    content: "Add Menu";
+    font-size: 90%;
+    margin-left: 5px;
+}
+
 .wrap-wpmenu-list:hover .wpmenu-editor + .wrap-inline-action {
     display: block;
 }
@@ -59,8 +71,6 @@
     width: 100%;
     min-height: 20px;
     line-height: 30px;
-    overflow: hidden;
-    word-wrap: break-word;
     cursor: move;
 }
 .wpmenu-editor .menu-item .menu-item-bar .menu-item-handle * {
@@ -174,4 +184,11 @@
 }
 .menu-item.opened .menu-item-body {
     display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .wpmenu-editor .menu-item{
+        width: calc(100% - calc(var(--wpmenu-depth) * 20px));
+    }
 }

@@ -37,8 +37,14 @@
         defaults = {
             always_show_url: false,
             inline_addmenu: true,
+            confirm_remove_menu: true,
             max_depth: 2,
             btn_addmenu_selector: '[data-wpmenu-source] .btn-addmenu',
+
+            /**
+             * Hold data menus in json
+             */
+            // menus: [],
 
             /**
              * Custom data collector before add menu
@@ -51,10 +57,31 @@
             /**
              * Custom event on menu added
              * Scope: .wpmenu-editor
+             * @param {Event} e The event
+             * @param {Dom Element} $item Dom Element of menu item
              *
              * @return void
              */
             // onMenuAdded: function(e, $item) {  },
+
+            /**
+             * Custom event after menu removed
+             * Scope: .wpmenu-editor
+             * @param {Event} e The event
+             *
+             * @return void
+             */
+            // onMenuRemoved: function(e) {  },
+
+            /**
+             * Custom event before menu removed
+             * Scope: .wpmenu-editor
+             * @param {Event} e The event
+             * @param {Dom Element} $item Dom Element of menu item
+             *
+             * @return {Boolean} confirm to remove
+             */
+            // onMenuConfirmRemove: function(e, $item) {  },
         }
     ;
 
@@ -94,6 +121,9 @@
 
         // Hold moved item from sortable
         this.moved_item = null;
+
+        // Hold remove menu confirmation
+        this.confirm_removed = null;
 
         // Store a reference to the source element
         this.el = element;
@@ -145,10 +175,29 @@
             this._inserterEvents();
 
             var instance = this;
+
             this.$el.bind('wpmenu:added', function(e, item){
+                instance._menuAddRemoveMenu.call(instance);
+
                 if ('function' == typeof instance.options.onMenuAdded)
                     instance.options.onMenuAdded.call(instance, e, $(item));
-            })
+            });
+
+            if (this.options.confirm_remove_menu){
+                this.$el.bind('wpmenu:before-remove', function(e, item){
+                    if ('function' == typeof instance.options.onMenuConfirmRemove)
+                        instance.confirm_removed = instance.options.onMenuConfirmRemove.call(instance, e, $(item));
+                    else
+                        instance.confirm_removed = confirm('Do you really want to remove this item?');
+                });
+            }
+
+            this.$el.bind('wpmenu:removed', function(e){
+                instance._menuAddRemoveMenu.call(instance);
+
+                if ('function' == typeof instance.options.onMenuRemoved)
+                    instance.options.onMenuRemoved.call(instance, e);
+            });
         },
 
         /**
@@ -236,10 +285,8 @@
             var $item = null,
                 html = '';
 
-            if (menus && menus.length){
-
-                this.add.call(this, menus);
-            }
+            // wrap this.$el with container
+            this.$el.wrap($('<div class="wpmenu-editor-container"></div>'));
 
             // render btn inline-addmenu
             if (this.options.inline_addmenu){
@@ -249,6 +296,14 @@
                     +'</div>'
                 ;
                 this.$el.after(html);
+            }
+
+            if (menus && menus.length){
+
+                this.add.call(this, menus);
+            }
+            else{
+                this.$el.addClass('empty-menu');
             }
 
             this._update.call(this);
@@ -277,6 +332,17 @@
             else{
                 this.$el.trigger('sortupdate');
             }
+        },
+
+        /**
+         * Event handle of after menu add or removed
+         * On empty menu, class .empty-menu added to this.$el
+         *
+         * return void
+         */
+        _menuAddRemoveMenu: function(){
+            var hasMenu = this.$el.find('.menu-item').length;
+            this.$el.toggleClass('empty-menu', !hasMenu);
         },
 
         /**
@@ -469,14 +535,14 @@
                 }, 120);
             });
 
-            // on click btn mover
+            // on click btn actions
             $menu_item.find('.menu-item-wrap-action [data-act]').each(function(){
                 $(this).on('click', function(e){
                     var $me = $(this),
                         act = $me.data('act'),
                         $menu = $me.closest('.menu-item');
 
-                    instance._moveMenu.call(instance, $menu, act);
+                    instance._actionMenu.call(instance, $menu, act);
                 });
             });
 
@@ -499,13 +565,13 @@
         },
 
         /**
-         * Move given $menu_item of specified direction
+         * Action given $menu_item of specified act or direction
          * @param {DOM Element} $menu_item The DOM element of .menu-item
          * @param {String} action Action or direction to move element
          *
          * @return void
          */
-        _moveMenu: function($menu_item, action) {
+        _actionMenu: function($menu_item, action) {
             var menu_index = $menu_item.index();
             var menu_count = $menu_item.parent().find('.menu-item').length;
             var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
@@ -570,9 +636,24 @@
                 break;
 
                 case "remove":
+                    var removed = null;
+                    this.$el.trigger('wpmenu:before-remove', $menu_item);
 
-                    // $menu_item.insertAfter($menu_target);
-                    $menu_item.remove();
+                    if (this.options.confirm_remove_menu){
+                        if (this.confirm_removed){
+                            $menu_item.remove();
+                            removed = true;
+                        }
+
+                        this.confirm_removed = null;
+                    }
+                    else{
+                        $menu_item.remove();
+                        removed = true;
+                    }
+
+                    if (removed)
+                        this.$el.trigger('wpmenu:removed');
                 break;
 
                 case "cancel":
@@ -604,6 +685,8 @@
 
                 instance._restructureMenu.call(instance, index, $(item), menu_count);
             });
+
+            this.moved_item = null;
         },
 
         /**
