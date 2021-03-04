@@ -35,10 +35,23 @@
 
     var pluginName = 'wpMenuEditor',
         defaults = {
+            // {Boolean} Always show input url;
+            // On False: source type category will be hidden
             always_show_url: false,
+
+            // {Boolean} Show button quick add menu item
             inline_addmenu: true,
+
+            // {Boolean} Focus to edit after add single menu item
+            focus_on_addmenu: true,
+
+            // {Boolean} Confirm on remove menu item
             confirm_remove_menu: true,
+
+            // {Integer} Max depth of menu
             max_depth: 2,
+
+            // {String} Selector button to add menu
             btn_addmenu_selector: '[data-wpmenu-source] .btn-addmenu',
 
             /**
@@ -1032,6 +1045,8 @@
 
                             if (field)
                                 item_data[field] = $input.val();
+
+                            $input.val('');
                         });
 
                         if (item_data.text)
@@ -1043,6 +1058,8 @@
                             item_data = $.extend({}, item_data, $input.data());
 
                             data.push(item_data);
+
+                            $input.prop('checked', !1);
                         });
                     }
 
@@ -1052,8 +1069,16 @@
                         data = instance.options.addMenuDataCollector.call($wrap, data);
                     }
 
-                    if (data.length)
+                    if (data.length){
                         instance.add.call(instance, data);
+
+                        if (data.length == 1 && instance.options.focus_on_addmenu){
+                            var $last_menu_item = instance._lastMenuItem().addClass('opened');
+
+                            $last_menu_item.find('[data-field="text"]')
+                                .focus().select();
+                        }
+                    }
                 });
 
                 // assign toggler event only if bootstrap $.fn.collapse undefined
