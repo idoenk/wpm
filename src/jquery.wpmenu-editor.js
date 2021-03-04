@@ -920,10 +920,12 @@
                         return true;
 
                     // skip unchecked checkbox input
-                    if ($input.attr('type') == 'checkbox' && !$input.is(':checked'))
-                        return true;
-
-                    live_data[field] = $input.val();
+                    if ($input.attr('type') == 'checkbox'){
+                        live_data[field] = ($input.is(':checked') ? $input.val() : '');
+                    }
+                    else{
+                        live_data[field] = $input.val();
+                    }
                 });
                 item_data = $.extend({}, item_data, live_data);
                 item_data[field_index] = index;
