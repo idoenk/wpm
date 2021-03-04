@@ -4,7 +4,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Wordpress Menu Editor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="../src/style.css" />
+    <link rel="stylesheet" href="../src/jquery.wpmenu-editor.css" />
+
+    <link rel="stylesheet" href="../src/demo-style.css" />
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
@@ -18,15 +20,15 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4">
-                <div class="wpmenu-accordion mb-4" data-target=".wpmenu-editor">
-                    <div class="wpmenu-accordion-item" data-type="link">
+                <div class="wpmenu-accordion mb-4" data-wpmenu-target=".wpmenu-editor">
+                    <div class="wpmenu-accordion-item" data-wpmenu-source="link">
                         <div class="wpmenu-accordion-header">
                             <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#custom-link" aria-expanded="false" aria-controls="custom-link">
                                 Link
                                 <i class="icon icon-down"></i>
                             </button>
                         </div>
-                        <div class="wpmenu-accordion-body" id="custom-link">
+                        <div class="wpmenu-accordion-body" id="custom-link" data-wpmenu-body>
                             <div class="wpmenu-input">
                                 <div class="mb-2">
                                     <div class="input-group">
@@ -54,14 +56,14 @@
                         </div>
                     </div>
 
-                    <div class="wpmenu-accordion-item" data-type="category">
+                    <div class="wpmenu-accordion-item" data-wpmenu-source="category">
                         <div class="wpmenu-accordion-header">
                             <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#category-list" aria-expanded="false" aria-controls="category-list">
                                 Categories
                                 <i class="icon icon-down"></i>
                             </button>
                         </div>
-                        <div class="wpmenu-accordion-body" id="category-list">
+                        <div class="wpmenu-accordion-body" id="category-list" data-wpmenu-body>
                             <div class="wpmenu-input">
                                 <ul class="list-unstyled">
                                     <li>
@@ -100,11 +102,12 @@
                 </div>
 
                 <div class="wrap-action mb-3">
-                    <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Get data</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Output JSON</button>
                 </div>
-                <div class="mb-3">
-                    <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:100px; width: 100%;"></textarea>
+                <div class="mb-5">
+                    <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:150px; width: 100%;"></textarea>
                 </div>
+                <div class="mb-5">&nbsp;</div>
             </div>
         </div>
     </div>
@@ -117,16 +120,24 @@
 
         var data_menus = [{"id":12, "url":"/", "text":"Home", "type":"link"}, {"id":73, "url":"/profile", "text":"Profile", "type":"link", "submenu": [{"id":32, "url":"/profile/about-us", "text":"About Us", "type":"link"}]}, {"id":52, "url":"/blog", "text":"Blog", "type":"link", "submenu": [{"id":521, "url":"/sports", "text":"Sports", "type":"category"}, {"id":523, "url":"/news", "text":"News", "type":"category"}]}, {"id":23, "url":"/contact", "text":"Contact", "type":"page", "new_tab":true}];
 
+        function randomBetween (min, max){
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        };
+
         $(function(){
             var wpmenu_options = {
                 max_depth: 2,
                 inline_addmenu: true,
-                btn_addmenu_selector: '.wpmenu-accordion .btn-addmenu',
-                btn_getdata: '.btn-getdata-wpmenu',
+                btn_addmenu_selector: '.btn-addmenu',
             };
+
             var $wpmenu = $('.wpmenu-editor').wpMenuEditor(wpmenu_options);
 
-            $wpmenu.wpMenuEditor('load', data_menus);
+            
+            setTimeout(function(){
+                $wpmenu.wpMenuEditor('load', data_menus);
+            }, randomBetween(2, 5) * 134);
+
 
             // get output
             $('.btn-getdata-wpmenu').on('click', function(){

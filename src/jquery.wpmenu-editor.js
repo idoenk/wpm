@@ -1,6 +1,6 @@
 /**!
  * wpMenuEditor
- * @author  Idoenk   <1d03nk@gmail.com> 2021
+ * @author  Idoenk   <1d03nk@gmail.com> https://github.com/idoenk
  * @license MIT
  */
 
@@ -37,8 +37,14 @@
         defaults = {
             always_show_url: false,
             inline_addmenu: true,
+            confirm_remove_menu: true,
             max_depth: 2,
-            btn_addmenu_selector: '.wpmenu-accordion .btn-addmenu',
+            btn_addmenu_selector: '[data-wpmenu-source] .btn-addmenu',
+
+            /**
+             * Hold data menus in json
+             */
+            // menus: [],
 
             /**
              * Custom data collector before add menu
@@ -51,10 +57,31 @@
             /**
              * Custom event on menu added
              * Scope: .wpmenu-editor
+             * @param {Event} e The event
+             * @param {Dom Element} $item Dom Element of menu item
              *
              * @return void
              */
             // onMenuAdded: function(e, $item) {  },
+
+            /**
+             * Custom event after menu removed
+             * Scope: .wpmenu-editor
+             * @param {Event} e The event
+             *
+             * @return void
+             */
+            // onMenuRemoved: function(e) {  },
+
+            /**
+             * Custom event before menu removed
+             * Scope: .wpmenu-editor
+             * @param {Event} e The event
+             * @param {Dom Element} $item Dom Element of menu item
+             *
+             * @return {Boolean} confirm to remove
+             */
+            // onMenuConfirmRemove: function(e, $item) {  },
         }
     ;
 
@@ -91,6 +118,12 @@
 
         // Hold sortable state
         this.sortable = null;
+
+        // Hold moved item from sortable
+        this.moved_item = null;
+
+        // Hold remove menu confirmation
+        this.confirm_removed = null;
 
         // Store a reference to the source element
         this.el = element;
@@ -142,10 +175,29 @@
             this._inserterEvents();
 
             var instance = this;
+
             this.$el.bind('wpmenu:added', function(e, item){
+                instance._menuAddRemoveMenu.call(instance);
+
                 if ('function' == typeof instance.options.onMenuAdded)
                     instance.options.onMenuAdded.call(instance, e, $(item));
-            })
+            });
+
+            if (this.options.confirm_remove_menu){
+                this.$el.bind('wpmenu:before-remove', function(e, item){
+                    if ('function' == typeof instance.options.onMenuConfirmRemove)
+                        instance.confirm_removed = instance.options.onMenuConfirmRemove.call(instance, e, $(item));
+                    else
+                        instance.confirm_removed = confirm('Do you really want to remove this item?');
+                });
+            }
+
+            this.$el.bind('wpmenu:removed', function(e){
+                instance._menuAddRemoveMenu.call(instance);
+
+                if ('function' == typeof instance.options.onMenuRemoved)
+                    instance.options.onMenuRemoved.call(instance, e);
+            });
         },
 
         /**
@@ -233,10 +285,8 @@
             var $item = null,
                 html = '';
 
-            if (menus && menus.length){
-
-                this.add.call(this, menus);
-            }
+            // wrap this.$el with container
+            this.$el.wrap($('<div class="wpmenu-editor-container"></div>'));
 
             // render btn inline-addmenu
             if (this.options.inline_addmenu){
@@ -246,6 +296,14 @@
                     +'</div>'
                 ;
                 this.$el.after(html);
+            }
+
+            if (menus && menus.length){
+
+                this.add.call(this, menus);
+            }
+            else{
+                this.$el.addClass('empty-menu');
             }
 
             this._update.call(this);
@@ -274,6 +332,17 @@
             else{
                 this.$el.trigger('sortupdate');
             }
+        },
+
+        /**
+         * Event handle of after menu add or removed
+         * On empty menu, class .empty-menu added to this.$el
+         *
+         * return void
+         */
+        _menuAddRemoveMenu: function(){
+            var hasMenu = this.$el.find('.menu-item').length;
+            this.$el.toggleClass('empty-menu', !hasMenu);
         },
 
         /**
@@ -466,22 +535,28 @@
                 }, 120);
             });
 
-            // on click btn mover
+            // on click btn actions
             $menu_item.find('.menu-item-wrap-action [data-act]').each(function(){
                 $(this).on('click', function(e){
                     var $me = $(this),
                         act = $me.data('act'),
                         $menu = $me.closest('.menu-item');
 
-                    instance._moveMenu.call(instance, $menu, act);
+                    instance._actionMenu.call(instance, $menu, act);
                 });
             });
 
             // on click btn-togglemenu
             $menu_item.find('.btn-togglemenu').on('click', function(){
-                var $menu = $(this).closest('.menu-item');
+                var $menu = $(this).closest('.menu-item'),
+                    isOpened = $menu.hasClass('opened'),
+                    $icon = $menu.find('.icon').removeClass('icon-up icon-down');
 
-                $menu.toggleClass('opened', !$menu.hasClass('opened'));
+                $icon.toggleClass(function(){
+                    return !isOpened ? 'icon-up':'icon-down';
+                });
+
+                $menu.toggleClass('opened', !isOpened);
             });
 
 
@@ -490,13 +565,13 @@
         },
 
         /**
-         * Move given $menu_item of specified direction
+         * Action given $menu_item of specified act or direction
          * @param {DOM Element} $menu_item The DOM element of .menu-item
          * @param {String} action Action or direction to move element
          *
          * @return void
          */
-        _moveMenu: function($menu_item, action) {
+        _actionMenu: function($menu_item, action) {
             var menu_index = $menu_item.index();
             var menu_count = $menu_item.parent().find('.menu-item').length;
             var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
@@ -561,9 +636,24 @@
                 break;
 
                 case "remove":
+                    var removed = null;
+                    this.$el.trigger('wpmenu:before-remove', $menu_item);
 
-                    // $menu_item.insertAfter($menu_target);
-                    $menu_item.remove();
+                    if (this.options.confirm_remove_menu){
+                        if (this.confirm_removed){
+                            $menu_item.remove();
+                            removed = true;
+                        }
+
+                        this.confirm_removed = null;
+                    }
+                    else{
+                        $menu_item.remove();
+                        removed = true;
+                    }
+
+                    if (removed)
+                        this.$el.trigger('wpmenu:removed');
                 break;
 
                 case "cancel":
@@ -584,14 +674,19 @@
          *
          * @return void
          */
-        _prepareRestructureMenu: function(){
+        _prepareRestructureMenu: function($moved_item){
             var instance = this;
             var menu_count = this.$el.find('.menu-item').length;
+
+            if ($moved_item)
+                this.moved_item = $moved_item;
 
             this.$el.find('.menu-item').each(function(index, item){
 
                 instance._restructureMenu.call(instance, index, $(item), menu_count);
             });
+
+            this.moved_item = null;
         },
 
         /**
@@ -639,9 +734,12 @@
                 }
 
 
-                // Check control visibility of menu item based on its depth
+                // Check menu item based on depth
                 var $prev_menu = $menu_item.prev(),
                     prev_menu_depth = parseInt($prev_menu.attr('data-wpmenu-depth'))||0,
+                    $next_menu = $menu_item.next(),
+                    next_menu_depth = parseInt($next_menu.attr('data-wpmenu-depth'))||0,
+                    parent_menu_depth = 0,
                     $under_element = null,
                     $parent = null;
 
@@ -650,6 +748,14 @@
                     $parent = this._findParentMenuOf.call(this, $menu_item);
 
                     if ($parent && $parent.length){
+                        parent_menu_depth = parseInt($parent.attr('data-wpmenu-depth'))||0;
+
+                        // Corrent depth menu item
+                        if (Math.abs(menu_depth - parent_menu_depth) > 1){
+                            $menu_item.attr('data-wpmenu-depth', (parent_menu_depth+1))
+                                .css('--wpmenu-depth', (parent_menu_depth+1))
+                        }
+
                         $menu_item.find('[data-act="child-out"]')
                             .text('Out from '+$parent.find('.item-title').text())
                             .removeClass('d-none');
@@ -668,12 +774,27 @@
                     }
                 }
                 else{
-                    // State of under element is a parent or a previous sibling
-                    if (prev_menu_depth != menu_depth){
-                        $under_element = this._findParentMenuOf.call(this, $prev_menu); 
+                    $under_element = $prev_menu;
+
+                    // Unless moved item is current menu item;
+                    // check if state of prev & next having same depth > 0
+                    // make it same depth
+                    if (this.moved_item && $menu_item.is(this.moved_item)){
+                        if (prev_menu_depth && next_menu_depth && (prev_menu_depth == next_menu_depth)){
+                            $parent = this._findParentMenuOf.call(this, $prev_menu);
+
+                            $menu_item.attr('data-wpmenu-depth', prev_menu_depth)
+                                .css('--wpmenu-depth', prev_menu_depth)
+                                .find('[data-act="child-out"]')
+                                    .text('Out from '+$parent.find('.item-title').text())
+                                    .removeClass('d-none');
+                        }
                     }
                     else{
-                        $under_element = $prev_menu;
+                        // State of under element is a parent or a previous sibling
+                        if (prev_menu_depth != menu_depth){
+                            $under_element = this._findParentMenuOf.call(this, $prev_menu); 
+                        }
                     }
 
                     if ($under_element && $under_element.length){
@@ -890,15 +1011,15 @@
 
             $(this.options.btn_addmenu_selector).each(function(){
                 var $btn_addmenu = $(this),
-                    $wrap = $btn_addmenu.closest('.wpmenu-accordion-item'),
+                    $wrap = $btn_addmenu.closest('[data-wpmenu-source]'),
                     menu_type = $wrap.data('type') || 'link',
-                    $parent = $wrap.closest('.wpmenu-accordion');
+                    $parent = $wrap.closest('[data-wpmenu-target]');
                     $btn_toggler = $wrap.find('[data-toggle]'),
 
                 // on click: btn_addmenu_selector
                 $btn_addmenu.on('click', function(e){
                     var $me = $(this),
-                        $wrap = $me.closest('.wpmenu-accordion-body'),
+                        $wrap = $me.closest('[data-wpmenu-source]'),
                         item_data = {type: menu_type},
                         data = []
                     ;
@@ -935,46 +1056,49 @@
                         instance.add.call(instance, data);
                 });
 
-                // on click: btn [data-toggle]
-                $btn_toggler.on('click', function(){
-                    var $me = $(this),
-                        $target = $($me.data('target')),
-                        slide_speed = 45,
-                        $item = null,
-                        $parent = null
-                    ;
+                // assign toggler event only if bootstrap $.fn.collapse undefined
+                if ('undefined' == typeof $.fn.collapse){
+                    // on click: btn [data-toggle]
+                    $btn_toggler.on('click', function(){
+                        var $me = $(this),
+                            $target = $($me.data('target')),
+                            slide_speed = 45,
+                            $item = null,
+                            $parent = null
+                        ;
 
-                    if (!$target.length)
-                        return !0;
+                        if (!$target.length)
+                            return !0;
 
-                    $item = $me.closest('.wpmenu-accordion-item');
-                    $parent = $item.closest('.wpmenu-accordion');
+                        $item = $me.closest('[data-wpmenu-source]');
+                        $parent = $item.closest('[data-wpmenu-target]');
 
-                    $item.addClass('going-to');
-                    $parent.find('.wpmenu-accordion-item.show:not(.going-to)')
-                        .each(function(){
-                            var $me = $(this);
-                            var $body = $me.find('.wpmenu-accordion-body');
-                            $me.removeClass('show');
+                        $item.addClass('going-to');
+                        $parent.find('[data-wpmenu-source].show:not(.going-to)')
+                            .each(function(){
+                                var $me = $(this);
+                                var $body = $me.find('[data-wpmenu-body]');
+                                $me.removeClass('show');
 
-                            if (!$body.is($target)){
-                                $body.removeClass('show')
-                                    .toggle(slide_speed);
-                            }
+                                if (!$body.is($target)){
+                                    $body.removeClass('show')
+                                        .toggle(slide_speed);
+                                }
+                            });
+
+                        $target.toggle(slide_speed, function(){
+                            var $me = $(this),
+                                isVisible = $me.is(":visible")
+
+                            $me.toggleClass('show', isVisible);
+
+                            $me.closest('[data-wpmenu-source]')
+                                .toggleClass('show', isVisible);
                         });
 
-                    $target.toggle(slide_speed, function(){
-                        var $me = $(this),
-                            isVisible = $me.is(":visible")
-
-                        $me.toggleClass('show', isVisible);
-
-                        $me.closest('.wpmenu-accordion-item')
-                            .toggleClass('show', isVisible);
+                        $item.toggleClass('going-to', !$target.is(":visible"));
                     });
-
-                    $item.toggleClass('going-to', !$target.is(":visible"));
-                });
+                }
             });
         },
 
@@ -1004,9 +1128,9 @@
                 animation: 80,
 
                 // Element dragging ended
-                onEnd: function (e) {
+                onEnd: function (e, foo) {
 
-                    instance._prepareRestructureMenu.call(instance);
+                    instance._prepareRestructureMenu.call(instance, $(e.item));
                     return !1;
                 },
 
@@ -1051,7 +1175,7 @@
             // stores a reference withint the element's data
             return this.each(function() {
                 if (!$.data(this, 'plugin_' + pluginName)) {
-                    $.data(this, 'plugin_' + pluginName, new WPMenuEditor(this, options));
+                    $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
                 }
             });
         } else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
@@ -1067,7 +1191,7 @@
                 // Invoke the speficied method on each selected element
                 return this.each(function() {
                     var instance = $.data(this, 'plugin_' + pluginName);
-                    if (instance instanceof WPMenuEditor && typeof instance[options] === 'function') {
+                    if (instance instanceof Plugin && typeof instance[options] === 'function') {
                         instance[options].apply(instance, Array.prototype.slice.call(args, 1));
                     }
                 });

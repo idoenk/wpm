@@ -98,13 +98,12 @@
 
             <div class="col">
                 <div class="wrap-wpmenu-list mb-3">
-                    <ul class="wpmenu-editor" data-menus='[{"url":"/", "text":"Home", "type":"link"}]'></ul>
+                    <ul class="wpmenu-editor"></ul>
                 </div>
 
                 <div class="wrap-action mb-3">
                     <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Output JSON</button>
                 </div>
-
                 <div class="mb-5">
                     <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:150px; width: 100%;"></textarea>
                 </div>
@@ -124,17 +123,6 @@
                 max_depth: 2,
                 inline_addmenu: true,
                 btn_addmenu_selector: '.btn-addmenu',
-
-                // Force inserted text to be ucwords formated
-                addMenuDataCollector: function(data) {
-                    var item_data = data[0];
-                    item_data.text = item_data.text.toLowerCase()
-                        .replace(/(?<= )[^\s]|^./g, a => a.toUpperCase());
-
-                    data[0] = item_data;
-
-                    return data;
-                },
             };
 
             var $wpmenu = $('.wpmenu-editor').wpMenuEditor(wpmenu_options);

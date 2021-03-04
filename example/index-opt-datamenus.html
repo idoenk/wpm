@@ -98,13 +98,12 @@
 
             <div class="col">
                 <div class="wrap-wpmenu-list mb-3">
-                    <ul class="wpmenu-editor" data-menus='[{"url":"/", "text":"Home", "type":"link"}]'></ul>
+                    <ul class="wpmenu-editor"></ul>
                 </div>
 
                 <div class="wrap-action mb-3">
                     <button type="button" class="btn btn-sm btn-primary btn-getdata-wpmenu">Output JSON</button>
                 </div>
-
                 <div class="mb-5">
                     <textarea readonly class="form-control output-result" style="font-family: 'monospace'; font-size:13px; min-height:150px; width: 100%;"></textarea>
                 </div>
@@ -119,25 +118,26 @@
       (function($){
         function clog(x){console.warn(x)}
 
+        function randomBetween (min, max){
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        };
+
         $(function(){
             var wpmenu_options = {
                 max_depth: 2,
                 inline_addmenu: true,
                 btn_addmenu_selector: '.btn-addmenu',
 
-                // Force inserted text to be ucwords formated
-                addMenuDataCollector: function(data) {
-                    var item_data = data[0];
-                    item_data.text = item_data.text.toLowerCase()
-                        .replace(/(?<= )[^\s]|^./g, a => a.toUpperCase());
-
-                    data[0] = item_data;
-
-                    return data;
-                },
+                menus: [{"id":12, "url":"/", "text":"Home", "type":"link"}, {"id":73, "url":"/profile", "text":"Profile", "type":"link", "submenu": [{"id":32, "url":"/profile/about-us", "text":"About Us", "type":"link"}]}, {"id":52, "url":"/blog", "text":"Blog", "type":"link", "submenu": [{"id":521, "url":"/sports", "text":"Sports", "type":"category"}, {"id":523, "url":"/news", "text":"News", "type":"category"}]}, {"id":23, "url":"/contact", "text":"Contact", "type":"page", "new_tab":true}],
             };
 
             var $wpmenu = $('.wpmenu-editor').wpMenuEditor(wpmenu_options);
+
+            
+            setTimeout(function(){
+                $wpmenu.wpMenuEditor('load', data_menus);
+            }, randomBetween(2, 5) * 134);
+
 
             // get output
             $('.btn-getdata-wpmenu').on('click', function(){
