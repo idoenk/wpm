@@ -87,18 +87,15 @@
     line-height: 1.5em;
     cursor: pointer!important;
 }
-.wpmenu-accordion-header .btn .icon,
 .wpmenu-editor .menu-item-handle .btn-togglemenu .icon {
     background-size: cover;
     background-repeat: no-repeat;
     width: 20px;
     height: 20px;
 }
-.wpmenu-accordion-header .btn .icon-up, 
 .wpmenu-editor .menu-item-handle .btn-togglemenu .icon-up {
     background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMTUuOTk3IDEzLjM3NGwtNy4wODEgNy4wODFMNyAxOC41NGw4Ljk5Ny04Ljk5OCA5LjAwMyA5LTEuOTE2IDEuOTE2eiIvPjwvc3ZnPg==');
 }
-.wpmenu-accordion-header .btn .icon-down,
 .wpmenu-editor .menu-item-handle .btn-togglemenu .icon-down {
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cGF0aCBkPSJNMTYuMDAzIDE4LjYyNmw3LjA4MS03LjA4MUwyNSAxMy40NmwtOC45OTcgOC45OTgtOS4wMDMtOSAxLjkxNy0xLjkxNnoiLz48L3N2Zz4=);
 }
@@ -177,58 +174,4 @@
 }
 .menu-item.opened .menu-item-body {
     display: block;
-}
-
-/* wpmenu-accordion */
-.wpmenu-accordion {}
-
-.wpmenu-accordion-item {
-    box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);
-    margin-bottom: 0;
-}
-
-.wpmenu-accordion-item:hover  .wpmenu-accordion-header,
-.wpmenu-accordion-item.show  .wpmenu-accordion-header {
-    background-color: #F5F5F5;
-}
-.wpmenu-accordion-header {
-    position: relative;
-    border-bottom: 1px solid rgba(0,0,0,.125);
-    padding: 0.3rem 0;
-    height: inherit;
-    border-radius: 0;
-    background-color: #fff;
-    overflow: hidden;
-}
-
-.wpmenu-accordion-header .btn {
-    color: #3A3D3F;
-    line-height: 1.2;
-    font-size: 0.9rem;
-    font-weight: 600;
-    position: relative;
-    z-index: 2;
-    border-radius: 0;
-}
-.wpmenu-accordion-header .btn:focus {
-    outline: none;
-    box-shadow: none;
-}
-.wpmenu-accordion-header .btn .icon {
-    position: absolute;
-    z-index: 1;
-    right: 10px;
-    top: 5px;
-    font-size: 1rem;
-    color: #828282;
-}
-.wpmenu-accordion-body {
-    padding: .75rem;
-}
-.wpmenu-accordion-body:not(.show) {
-    display: none;
-}
-.wpmenu-accordion-body .form-control,
-.wpmenu-accordion-body .input-group-text{
-    border-radius: 0;
 }
