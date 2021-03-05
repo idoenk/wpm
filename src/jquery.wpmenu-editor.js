@@ -32,6 +32,7 @@
         factory(jQuery, window, document);
     }
 }(function($, window, document, undefined) {
+    "use strict";
 
     var pluginName = 'wpMenuEditor',
         defaults = {
@@ -1038,8 +1039,9 @@
                 var $btn_addmenu = $(this),
                     $wrap = $btn_addmenu.closest('[data-wpmenu-source]'),
                     menu_type = $wrap.data('type') || 'link',
-                    $parent = $wrap.closest('[data-wpmenu-target]');
-                    $btn_toggler = $wrap.find('[data-toggle]'),
+                    $parent = $wrap.closest('[data-wpmenu-target]'),
+                    $btn_toggler = $wrap.find('[data-toggle]');
+
 
                 // on click: btn_addmenu_selector
                 $btn_addmenu.on('click', function(e){
@@ -1061,10 +1063,17 @@
                             $input.val('');
                         });
 
-                        if (item_data.text)
+                        // Empty text will have value atleast from its url
+                        if (!item_data.text && item_data.url)
+                            item_data.text = (""+item_data.url).toLowerCase()
+                                .replace(/^https?\:\/\/(?:w{3,}\.)?/g, '')
+                                .replace(/\//g, '');
+
+                        if (item_data.text && item_data.url)
                             data.push(item_data);
-                    }else if($wrap.find('[data-url]').length && $wrap.find('[type="checkbox"]:checked').length){
-                        $wrap.find('[type="checkbox"]:checked').each(function(){
+
+                    }else if($wrap.find('[data-text][type="checkbox"]:checked').length){
+                        $wrap.find('[data-text][type="checkbox"]:checked').each(function(){
                             var $input = $(this);
 
                             item_data = $.extend({}, item_data, $input.data());
@@ -1091,6 +1100,19 @@
                                 .focus().select();
                         }
                     }
+                });
+
+                // avoid submit with enter on input text
+                $wrap.find('[data-field], [type="checkbox"][data-text]').each(function(){
+                    $(this).on('keydown', function(e){
+                        if (e.which === 13){
+                            $(this).closest('[data-wpmenu-source]')
+                                .find('.btn-addmenu')
+                                .trigger('click');
+
+                            return !1;
+                        }
+                    });
                 });
 
                 // assign toggler event only if bootstrap $.fn.collapse undefined
