@@ -28,16 +28,22 @@
     font-size: 90%;
     margin-left: 5px;
 }
-
 .wrap-wpmenu-list:hover .wpmenu-editor + .wrap-inline-action {
     display: block;
 }
-
 .btn-inline-addmenu {
     padding: 0 10px;
     border-radius: 0;
     line-height: 1.5;
     height: initial;
+}
+
+.wpmenu-editor .d-none {
+    display: none!important;
+}
+.wpmenu-editor .disabled {
+    pointer-events: none;
+    opacity: .65;
 }
 
 .wpmenu-editor .menu-item {
