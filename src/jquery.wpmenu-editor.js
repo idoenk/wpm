@@ -761,7 +761,6 @@
 
                 // menu item is a submenu of other
                 if (menu_depth){
-                    clog('in here: name: '+$menu_item.find('.item-title').text()+', menu_depth='+menu_depth);
                     $parent = this._findParentMenuOf.call(this, $menu_item);
 
                     if ($parent && $parent.length){
