@@ -1068,7 +1068,7 @@
                                 .replace(/^https?\:\/\/(?:w{3,}\.)?/g, '')
                                 .replace(/\//g, '');
 
-                        if (item_data.text && item_data.url)
+                        if (item_data.text)
                             data.push(item_data);
 
                     }else if($wrap.find('[data-text][type="checkbox"]:checked').length){
