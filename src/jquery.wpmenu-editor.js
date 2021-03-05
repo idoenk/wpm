@@ -713,11 +713,17 @@
          * @return void
          */
         _restructureMenu: function(index, $menu_item, menu_count){
+            var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
+
             // reset: hide all mover child & action
             $menu_item.find('.action-child, .action-child [data-act]')
                 .addClass('d-none');
 
-            var menu_depth = parseInt($menu_item.attr('data-wpmenu-depth'))||0;
+            // reset up & down enabled
+            $menu_item.find('[data-act="up"], [data-act="down"]')
+                .removeClass('disabled')
+                .prop('disabled', !1);
+
 
             if (index == 0){
                 $menu_item.find('[data-act="up"]')
@@ -734,10 +740,6 @@
                 // reset
                 $menu_item.find('.action-child')
                     .removeClass('d-none');
-
-                $menu_item.find('[data-act="up"], [data-act="down"]')
-                    .removeClass('disabled')
-                    .prop('disabled', !1);
 
                 // last menu? disable move-down
                 if (index == (menu_count - 1)){
