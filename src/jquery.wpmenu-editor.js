@@ -174,6 +174,8 @@
          *         
          */
         init: function() {
+            var instance = this;
+
             // Check for dependency
             if ('function' !== typeof Sortable){
                 console.error('Missing required package: Sortable. see: https://cdnjs.com/libraries/Sortable/1.13.0');
@@ -183,12 +185,6 @@
             if (!this.options.menus){
                 this.options.menus = this.$el.data('menus') || [];
             }
-
-            this._renderMenu.call(this);
-
-            this._inserterEvents();
-
-            var instance = this;
 
             this.$el.bind('wpmenu:added', function(e, item){
                 instance._menuAddRemoveMenu.call(instance);
@@ -212,6 +208,10 @@
                 if ('function' == typeof instance.options.onMenuRemoved)
                     instance.options.onMenuRemoved.call(instance, e);
             });
+
+            this._renderMenu.call(this);
+
+            this._inserterEvents();
         },
 
         /**
