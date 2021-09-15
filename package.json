@@ -1,0 +1,27 @@
+{
+  "name": "wpmenu-editor",
+  "version": "1.0.0",
+  "description": "Menu editor like in Wordpress",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idoenk/wpm.git"
+  },
+  "keywords": [
+    "wpm",
+    "wpmenu",
+    "wordpress"
+  ],
+  "author": "Idoenk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/idoenk/wpm/issues"
+  },
+  "homepage": "https://github.com/idoenk/wpm#readme"
+}
